@@ -1,0 +1,118 @@
+import java.util.List;
+
+class Curso {
+    String nombre;
+    int horas;
+
+    public Curso(String nombre, int horas) {
+        this.nombre = nombre;
+        this.horas = horas;
+    }
+}
+
+enum Categoria {
+    AUXILIAR(40000),
+    ASISTENTE(45000),
+    ASOCIADO(50000),
+    TITULAR(55000);
+
+    private final double valorHora;
+
+    Categoria(double valorHora) {
+        this.valorHora = valorHora;
+    }
+
+    public double getValorHora() {
+        return valorHora;
+    }
+}
+
+class DepartamentoAcademico {
+    String nombre;
+    Docente director;
+
+    public DepartamentoAcademico(String nombre, Docente director) {
+        this.nombre = nombre;
+        this.director = director;
+    }
+}
+
+abstract class Docente {
+    String nombre;
+    String tituloProfesional;
+    DepartamentoAcademico departamento;
+    List<Curso> cursosDocencia;
+
+    public Docente(String nombre, String tituloProfesional, DepartamentoAcademico departamento, List<Curso> cursosDocencia) {
+        this.nombre = nombre;
+        this.tituloProfesional = tituloProfesional;
+        this.departamento = departamento;
+        this.cursosDocencia = cursosDocencia;
+    }
+
+    public abstract double calcularSalarioMensual();
+}
+
+class Catedra extends Docente {
+    int añosExperiencia;
+    int trabajosPresentados;
+    Categoria categoria;
+
+    public Catedra(String nombre, String tituloProfesional, DepartamentoAcademico departamento, List<Curso> cursosDocencia,
+                   int añosExperiencia, int trabajosPresentados, Categoria categoria) {
+        super(nombre, tituloProfesional, departamento, cursosDocencia);
+        this.añosExperiencia = añosExperiencia;
+        this.trabajosPresentados = trabajosPresentados;
+        this.categoria = categoria;
+    }
+
+    @Override
+    public double calcularSalarioMensual() {
+        return categoria.getValorHora() * 160; // Asumiendo 160 horas de trabajo al mes
+    }
+
+    public Categoria validarCategoria() {
+        if (añosExperiencia >= 8 && trabajosPresentados >= 2) {
+            return Categoria.TITULAR;
+        } else if (añosExperiencia >= 6 && trabajosPresentados >= 1) {
+            return Categoria.ASOCIADO;
+        } else if (añosExperiencia >= 4 && trabajosPresentados >= 1) {
+            return Categoria.ASISTENTE;
+        } else if (añosExperiencia >= 2) {
+            return Categoria.AUXILIAR;
+        } else {
+            return null;
+        }
+    }
+}
+
+class Ocasional extends Docente {
+    String nivelEstudio;
+    double salarioMensual;
+
+    public Ocasional(String nombre, String tituloProfesional, DepartamentoAcademico departamento, List<Curso> cursosDocencia,
+                     String nivelEstudio, double salarioMensual) {
+        super(nombre, tituloProfesional, departamento, cursosDocencia);
+        this.nivelEstudio = nivelEstudio;
+        this.salarioMensual = salarioMensual;
+    }
+
+    @Override
+    public double calcularSalarioMensual() {
+        return salarioMensual;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // Ejemplo de uso
+        DepartamentoAcademico depto = new DepartamentoAcademico("Ingeniería", null);
+        Curso curso = new Curso("Docencia Universitaria", 40);
+
+        List<Curso> cursos = List.of(curso);
+        Catedra profCatedra = new Catedra("Ana Gómez", "Ingeniera", depto, cursos, 3, 1, Categoria.AUXILIAR);
+
+        System.out.println("Salario Mensual del Profesor Catedra: " + profCatedra.calcularSalarioMensual());
+        System.out.println("Categoría del Profesor: " + profCatedra.validarCategoria());
+    }
+}
